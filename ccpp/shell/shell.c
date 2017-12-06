@@ -119,4 +119,35 @@ char **shell_split_line(char *line)
   return tokens;
 } /* I definetively should study this function to know exactly how it works, and not just what it does.. :/ */
 
-/* CONTINUE: How shells start processes */
+int lsh_launch( char ** args )
+{
+
+	pid_t pid, wpid;
+	int status;
+
+	pid = fork();
+	if(pid == 0)
+	{
+		if(execvp(args[0], args) == -1) /* take a time after and understand this function */
+		{
+			perror("lsh");
+		}
+		exit(EXIT_FAILURE);
+	}
+	else if(pid <= 0)
+	{
+		perror("lsh");		
+	}
+	else
+	{
+		do
+		{
+			wpid = waitpid(pid, &status, WUNTRACED);
+		}
+		while(!WIFEXISTED(status) && !WIFSIGNALED(status));
+	}
+	return 1;
+}
+
+
+/* CONTINUE: SHELL BUILTINS */
